@@ -242,6 +242,57 @@ test(`Given a list of toggl time entries
   expect(updateOperation.payload.ended_at_time).toBe('16:00')
 })
 
+test(`Given a list of toggl time entries
+  When a matching papierkram time entry exists
+  And the comments do not match anymore
+  Then the papierkram time entry should be marked as to be updated
+  And contain the updated comment`, () => {
+  const toggleTimeEntryId = 8921379
+  const toggleImportComment: { meta: PapierkramTogglMeta } = {
+    meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
+  }
+
+  const papierkramTimeEntries = [
+    createPapierkramTimeEntry({
+      id: 1,
+
+      comments: `Hi, this is my comment\n\n--\n\n${JSON.stringify(
+        toggleImportComment
+      )}`,
+      started_at: '2024-11-22T15:00:00.000+01:00',
+      ended_at: '2024-11-22T16:00:00.000+01:00'
+    })
+  ]
+
+  const papierkramTimeEntryImportedFromToggl = papierkramTimeEntries
+    .map(createPapierkramTimeEntryWithTogglImportInformation)
+    .filter(timeEntry => !!timeEntry)
+
+  const togglTimeEntries = [
+    createTogglTimeEntry({
+      id: toggleTimeEntryId,
+      description: 'Hi, this is my comment with an addition',
+      start: '2024-11-22T14:00:00.000+00Z',
+      stop: '2024-11-22T15:00:00.000+00Z'
+    })
+  ]
+
+  const [updateOperation] = buildPapierkramImportOperations(
+    papierkramTimeEntryImportedFromToggl,
+    togglTimeEntries
+  ) as [PapierkramTimeEntryUpdateOperation]
+
+  expect(updateOperation).toStrictEqual({
+    type: 'update',
+    timeEntryId: 1,
+    payload: {
+      comments: `Hi, this is my comment with an addition\n\n---\n\n${JSON.stringify(
+        toggleImportComment
+      )}`
+    }
+  })
+})
+
 export function createTogglTimeEntry(props: TogglTimeEntry) {
   return { ...props }
 }
@@ -382,9 +433,15 @@ export function buildPapierkramImportOperations(
         updateRecord.entry_date = format(togglStartedAt, 'yyyy-MM-dd')
       }
 
+      const comments = createPapierkramTimeEntryComments(timeEntryPair.toggl)
+      if (comments !== timeEntryPair.papierkram.comments) {
+        updateRecord.comments = comments
+      }
+
       return startDifference !== 0 ||
         endDifference !== 0 ||
-        !isSameDay(papierkramStartedAt, togglStartedAt)
+        !isSameDay(papierkramStartedAt, togglStartedAt) ||
+        comments !== timeEntryPair.papierkram.comments
         ? {
             type: 'update' as const,
             timeEntryId: timeEntryPair.papierkram.id,
