@@ -7,6 +7,7 @@ import {
   PapierkramTogglMeta,
   TogglTimeEntry
 } from './papierkram-time-entry.spec'
+import { differenceInSeconds, format, isSameDay, parseISO } from 'date-fns'
 
 test(`Given a list of imported papierkram time entries
       When have no matching toggl time entry
@@ -20,8 +21,8 @@ test(`Given a list of imported papierkram time entries
     createPapierkramTimeEntry({
       id: 1,
       comments: JSON.stringify(toggleImportComment),
-      started_at: '',
-      ended_at: ''
+      started_at: '2024-11-22T15:15:00.000+01:00',
+      ended_at: '2024-11-22T15:15:00.000+01:00'
     })
   ]
 
@@ -30,10 +31,15 @@ test(`Given a list of imported papierkram time entries
     .filter(timeEntry => !!timeEntry)
 
   const togglTimeEntries = [
-    createTogglTimeEntry({ id: -1, description: '', start: '', stop: '' })
+    createTogglTimeEntry({
+      id: -1,
+      description: '',
+      start: '2024-11-22T15:15:00.000+01:00',
+      stop: '2024-11-22T15:15:00.000+01:00'
+    })
   ]
 
-  const [archiveOperation] = createPapierkramImportOperations(
+  const [archiveOperation] = buildPapierkramImportOperations(
     papierkramTimeEntryImportedFromToggl,
     togglTimeEntries
   )
@@ -59,15 +65,15 @@ test(`Given a list of toggl time entries
     createTogglTimeEntry({
       id: toggleTimeEntryId,
       description: '',
-      start: '',
-      stop: ''
+      start: '2024-11-22T15:15:00.000+01:00',
+      stop: '2024-11-22T15:15:00.000+01:00'
     })
   ]
 
-  const [createOperation] = createPapierkramImportOperations(
+  const [createOperation] = buildPapierkramImportOperations(
     papierkramTimeEntryImportedFromToggl,
     togglTimeEntries
-  )
+  ) as [PapierkramTimeEntryCreateOperation]
 
   expect(createOperation.type).toBe('create')
   expect(createOperation.payload.comments).toContain(expectedTogglMetaComment)
@@ -92,15 +98,15 @@ test(`Given a list of toggl time entries
     createTogglTimeEntry({
       id: toggleTimeEntryId,
       description: 'Worked very hard',
-      start: '',
-      stop: ''
+      start: '2024-11-22T15:15:00.000+01:00',
+      stop: '2024-11-22T15:15:00.000+01:00'
     })
   ]
 
-  const [createOperation] = createPapierkramImportOperations(
+  const [createOperation] = buildPapierkramImportOperations(
     papierkramTimeEntryImportedFromToggl,
     togglTimeEntries
-  )
+  ) as [PapierkramTimeEntryCreateOperation]
 
   expect(createOperation.payload.comments).toContain(
     `Worked very hard\n\n---\n\n${expectedTogglMetaComment}`
@@ -122,8 +128,8 @@ test(`Given a list of toggl time entries
       id: 1,
 
       comments: JSON.stringify(toggleImportComment),
-      started_at: '',
-      ended_at: ''
+      started_at: '2024-11-22T15:00:00.000+01:00',
+      ended_at: '2024-11-22T16:00:00.000+01:00'
     })
   ]
 
@@ -135,35 +141,157 @@ test(`Given a list of toggl time entries
     createTogglTimeEntry({
       id: toggleTimeEntryId,
       description: 'Worked very hard',
-      start: '',
-      stop: ''
+      start: '2024-11-22T13:00:00.000+00Z',
+      stop: '2024-11-22T15:00:00.000+00Z'
     })
   ]
 
-  const [createOperation] = createPapierkramImportOperations(
+  const [updateOperation] = buildPapierkramImportOperations(
     papierkramTimeEntryImportedFromToggl,
     togglTimeEntries
-  )
+  ) as [PapierkramTimeEntryUpdateOperation]
 
-  expect(createOperation.type).toBe('update')
-  expect(createOperation.payload.started_at_time).toBe('???')
+  expect(updateOperation.type).toBe('update')
+  expect(updateOperation.payload.started_at_time).toBe('14:00')
+})
+
+test(`Given a list of toggl time entries
+      When a matching papierkram time entry exists
+      And the end dates are not equal
+      Then the papierkram time entry should be marked as to be updated
+      And contain the updated end`, () => {
+  const toggleTimeEntryId = 8921379
+  const toggleImportComment: { meta: PapierkramTogglMeta } = {
+    meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
+  }
+
+  const papierkramTimeEntries = [
+    createPapierkramTimeEntry({
+      id: 1,
+
+      comments: JSON.stringify(toggleImportComment),
+      started_at: '2024-11-22T15:00:00.000+01:00',
+      ended_at: '2024-11-22T16:00:00.000+01:00'
+    })
+  ]
+
+  const papierkramTimeEntryImportedFromToggl = papierkramTimeEntries
+    .map(createPapierkramTimeEntryWithTogglImportInformation)
+    .filter(timeEntry => !!timeEntry)
+
+  const togglTimeEntries = [
+    createTogglTimeEntry({
+      id: toggleTimeEntryId,
+      description: 'Worked very hard',
+      start: '2024-11-22T14:00:00.000+00Z',
+      stop: '2024-11-22T16:00:00.000+00Z'
+    })
+  ]
+
+  const [updateOperation] = buildPapierkramImportOperations(
+    papierkramTimeEntryImportedFromToggl,
+    togglTimeEntries
+  ) as [PapierkramTimeEntryUpdateOperation]
+
+  expect(updateOperation.type).toBe('update')
+  expect(updateOperation.payload.started_at_time).toBeUndefined()
+  expect(updateOperation.payload.ended_at_time).toBe('17:00')
+})
+
+test(`Given a list of toggl time entries
+  When a matching papierkram time entry exists
+  And the days are not equal
+  Then the papierkram time entry should be marked as to be updated
+  And contain the updated end`, () => {
+  const toggleTimeEntryId = 8921379
+  const toggleImportComment: { meta: PapierkramTogglMeta } = {
+    meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
+  }
+
+  const papierkramTimeEntries = [
+    createPapierkramTimeEntry({
+      id: 1,
+
+      comments: JSON.stringify(toggleImportComment),
+      started_at: '2024-11-22T15:00:00.000+01:00',
+      ended_at: '2024-11-22T16:00:00.000+01:00'
+    })
+  ]
+
+  const papierkramTimeEntryImportedFromToggl = papierkramTimeEntries
+    .map(createPapierkramTimeEntryWithTogglImportInformation)
+    .filter(timeEntry => !!timeEntry)
+
+  const togglTimeEntries = [
+    createTogglTimeEntry({
+      id: toggleTimeEntryId,
+      description: 'Worked very hard',
+      start: '2024-11-21T14:00:00.000+00Z',
+      stop: '2024-11-21T15:00:00.000+00Z'
+    })
+  ]
+
+  const [updateOperation] = buildPapierkramImportOperations(
+    papierkramTimeEntryImportedFromToggl,
+    togglTimeEntries
+  ) as [PapierkramTimeEntryUpdateOperation]
+
+  expect(updateOperation.type).toBe('update')
+  expect(updateOperation.payload.entry_date).toBe('2024-11-21')
+  expect(updateOperation.payload.started_at_time).toBe('15:00')
+  expect(updateOperation.payload.ended_at_time).toBe('16:00')
 })
 
 export function createTogglTimeEntry(props: TogglTimeEntry) {
   return { ...props }
 }
 
-export type PapierkramImportOperation = {
-  type: 'create' | 'update' | 'archive'
-  payload: Partial<PapierkramTimeEntry>
+export type PapierkramImportOperation =
+  | PapierkramTimeEntryCreateOperation
+  | PapierkramTimeEntryUpdateOperation
+  | PapierkramTimeEntryArchiveOperation
+
+function createPapierkramTimeEntryComments(props: TogglTimeEntry): string {
+  const meta = {
+    meta: <PapierkramTogglMeta>{ toggl: { timeEntry: { id: props.id } } }
+  }
+
+  return props.description
+    ? `${props.description}\n\n---\n\n${JSON.stringify(meta)}`
+    : JSON.stringify(meta)
 }
 
-export function createPapierkramImportOperations(
+type PapierkramTimeEntryCreateOperation = {
+  type: 'create'
+  payload: PapierkramTimeEntryCreateDto
+}
+
+type PapierkramTimeEntryUpdateOperation = {
+  type: 'update'
+  timeEntryId: number
+  payload: PapierkramTimeEntryUpdateDto
+}
+
+type PapierkramTimeEntryArchiveOperation = {
+  type: 'archive'
+  timeEntryId: number
+}
+
+type PapierkramTimeEntryCreateDto = {
+  entry_date: string
+  started_at_time: string
+  ended_at_time: string
+  comments: string
+}
+
+type PapierkramTimeEntryUpdateDto = Partial<PapierkramTimeEntryCreateDto>
+
+export function buildPapierkramImportOperations(
   papierkram: PapierkramTimeEntryImportedFromToggl[],
   toggl: TogglTimeEntry[]
 ): PapierkramImportOperation[] {
   // Find time entries in papierkram that has been deleted in toggle to archive them.
-  const archiveOperations = papierkram
+  const archiveOperations: PapierkramTimeEntryArchiveOperation[] = papierkram
     .filter(
       papierkramTimeEntry =>
         !toggl.some(
@@ -171,15 +299,13 @@ export function createPapierkramImportOperations(
             togglTimeEntry.id === papierkramTimeEntry.meta.toggl.timeEntry.id
         )
     )
-    .map(timeEntry =>
-      createPapierkramImportOperation({
-        type: 'archive',
-        payload: { id: timeEntry.id }
-      })
-    )
+    .map(papierkramTimeEntry => ({
+      type: 'archive' as const,
+      timeEntryId: papierkramTimeEntry.id
+    }))
 
   // Find toggl time entries that need to be created in papierkram
-  const createOperations = toggl
+  const createOperations: PapierkramTimeEntryCreateOperation[] = toggl
     .filter(
       togglTimeEntry =>
         !papierkram.some(
@@ -187,29 +313,86 @@ export function createPapierkramImportOperations(
             papierkramTimeEntry.meta.toggl.timeEntry.id == togglTimeEntry.id
         )
     )
-    .map(createPapierkramCreateOperation)
+    .map(togglTimeEntry => {
+      const start = parseISO(togglTimeEntry.start)
+      const end = parseISO(togglTimeEntry.stop)
 
-  return [...archiveOperations, ...createOperations]
-}
+      return {
+        type: 'create' as const,
+        payload: {
+          entry_date: format(start, 'yyyy-MM-dd'),
+          started_at_time: format(start, 'HH:mm'),
+          ended_at_time: format(end, 'HH:mm'),
+          comments: createPapierkramTimeEntryComments(togglTimeEntry)
+        }
+      }
+    })
 
-function createPapierkramCreateOperation(
-  props: TogglTimeEntry
-): PapierkramImportOperation {
-  const meta = {
-    meta: <PapierkramTogglMeta>{ toggl: { timeEntry: { id: props.id } } }
-  }
-  const comments = props.description
-    ? `${props.description}\n\n---\n\n${JSON.stringify(meta)}`
-    : JSON.stringify(meta)
+  // Find toggl time entries that need to be updated in papierkram
+  const updateOperations: PapierkramTimeEntryUpdateOperation[] = toggl
+    .map(togglTimeEntry => {
+      const papierkramTimeEntry = papierkram.find(
+        papierkramTimeEntry =>
+          papierkramTimeEntry.meta.toggl.timeEntry.id == togglTimeEntry.id
+      )
 
-  return {
-    type: 'create',
-    payload: { comments }
-  }
-}
+      return {
+        timeEntryPair: {
+          toggl: togglTimeEntry,
+          papierkram: papierkramTimeEntry
+        }
+      }
+    })
+    .filter(
+      (
+        value
+      ): value is {
+        timeEntryPair: {
+          toggl: TogglTimeEntry
+          papierkram: PapierkramTimeEntryImportedFromToggl
+        }
+      } => !!value.timeEntryPair.papierkram
+    )
+    .map(({ timeEntryPair }) => {
+      const updateRecord: Partial<
+        Record<keyof PapierkramTimeEntryUpdateDto, string>
+      > = {}
+      const papierkramStartedAt = parseISO(timeEntryPair.papierkram.started_at)
+      const togglStartedAt = parseISO(timeEntryPair.toggl.start)
 
-function createPapierkramImportOperation(
-  props: PapierkramImportOperation
-): PapierkramImportOperation {
-  return { ...props }
+      const startDifference = differenceInSeconds(
+        papierkramStartedAt,
+        togglStartedAt
+      )
+
+      const papierkramEndedAt = parseISO(timeEntryPair.papierkram.ended_at)
+      const togglEndedAt = parseISO(timeEntryPair.toggl.stop)
+
+      const endDifference = differenceInSeconds(papierkramEndedAt, togglEndedAt)
+
+      if (startDifference !== 0) {
+        updateRecord.started_at_time = format(togglStartedAt, 'HH:mm')
+      }
+
+      if (endDifference !== 0) {
+        updateRecord.ended_at_time = format(togglEndedAt, 'HH:mm')
+      }
+
+      if (!isSameDay(papierkramStartedAt, togglStartedAt)) {
+        updateRecord.entry_date = format(togglStartedAt, 'yyyy-MM-dd')
+      }
+
+      return startDifference !== 0 ||
+        endDifference !== 0 ||
+        !isSameDay(papierkramStartedAt, togglStartedAt)
+        ? {
+            type: 'update' as const,
+            timeEntryId: timeEntryPair.papierkram.id,
+            payload: updateRecord
+          }
+        : null
+    })
+    .filter(operation => !!operation)
+
+  return [...archiveOperations, ...createOperations, ...updateOperations]
 }
