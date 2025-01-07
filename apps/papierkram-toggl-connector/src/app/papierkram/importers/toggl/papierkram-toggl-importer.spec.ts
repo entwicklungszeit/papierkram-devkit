@@ -28,7 +28,7 @@ test(`Given a list of imported papierkram time entries
 
   const papierkramTimeEntryImportedFromToggl = papierkramTimeEntries
     .map(createPapierkramTimeEntryWithTogglImportInformation)
-    .filter(timeEntry => !!timeEntry)
+    .filter(timeEntry => timeEntry !== null)
 
   const togglTimeEntries = [
     createTogglTimeEntry({
