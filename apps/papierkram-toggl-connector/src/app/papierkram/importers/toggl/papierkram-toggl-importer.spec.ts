@@ -1,4 +1,5 @@
-import { test, expect } from 'vitest'
+import { differenceInSeconds, format, isSameDay, parseISO } from 'date-fns'
+import { expect, test } from 'vitest'
 import {
   createPapierkramTimeEntry,
   createPapierkramTimeEntryWithTogglImportInformation,
@@ -7,7 +8,6 @@ import {
   PapierkramTogglMeta,
   TogglTimeEntry
 } from './papierkram-time-entry.spec'
-import { differenceInSeconds, format, isSameDay, parseISO } from 'date-fns'
 
 test(`Given a list of imported papierkram time entries
       When have no matching toggl time entry
@@ -111,6 +111,46 @@ test(`Given a list of toggl time entries
   expect(createOperation.payload.comments).toContain(
     `Worked very hard\n\n---\n\n${expectedTogglMetaComment}`
   )
+})
+
+test(`Given a list of toggl time entries
+      When no matching papierkram time entry exists
+      And nothing has changed
+      Then no operation should be built`, () => {
+  const toggleTimeEntryId = 8921379
+  const toggleImportComment: { meta: PapierkramTogglMeta } = {
+    meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
+  }
+
+  const papierkramTimeEntries = [
+    createPapierkramTimeEntry({
+      id: 1,
+
+      comments: JSON.stringify(toggleImportComment),
+      started_at: '2024-11-22T15:00:00.000+01:00',
+      ended_at: '2024-11-22T15:00:00.000+01:00'
+    })
+  ]
+
+  const papierkramTimeEntryImportedFromToggl = papierkramTimeEntries
+    .map(createPapierkramTimeEntryWithTogglImportInformation)
+    .filter(timeEntry => !!timeEntry)
+
+  const togglTimeEntries = [
+    createTogglTimeEntry({
+      id: toggleTimeEntryId,
+      description: '',
+      start: '2024-11-22T15:00:00.000+01:00',
+      stop: '2024-11-22T15:00:00.000+01:00'
+    })
+  ]
+
+  const operations = buildPapierkramImportOperations(
+    papierkramTimeEntryImportedFromToggl,
+    togglTimeEntries
+  ) as [PapierkramTimeEntryCreateOperation]
+
+  expect(operations).toHaveLength(0)
 })
 
 test(`Given a list of toggl time entries
