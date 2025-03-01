@@ -1,19 +1,21 @@
-import { differenceInSeconds, format, isSameDay, parseISO } from 'date-fns'
 import { expect, test } from 'vitest'
+import { PapierkramTimeEntry } from '../../types/papierkram-time-entry'
+import { TogglTimeEntry } from './types/toggl-time-entry'
+import { TogglMetaForPapierkram } from './types/toggl-meta-for-papierkram'
+import { createPapierkramTimeEntry } from '../../types/create-papierkram-time-entry'
+import { parseTogglMetaFromPapierkramTimeEntryComments } from './parse-toggl-meta-from-papierkram-time-entry.comments'
+import { createTogglTimeEntry } from './create-toggl-time-entry'
 import {
-  createPapierkramTimeEntry,
-  createPapierkramTimeEntryWithTogglImportInformation,
-  PapierkramTimeEntry,
-  PapierkramTimeEntryImportedFromToggl,
-  PapierkramTogglMeta,
-  TogglTimeEntry
-} from './papierkram-time-entry.spec'
+  PapierkramTimeEntryCreateOperation,
+  PapierkramTimeEntryUpdateOperation
+} from '../../types/papierkram-import-operation'
+import { determinePapierkramImportOperations } from './determine-papierkram-import-operations'
 
 test(`Given a list of imported papierkram time entries
       When have no matching toggl time entry
       Then the papierkram time entry should be flagged as to be archived`, () => {
   const toggleTimeEntryId = 8921379
-  const toggleImportComment: { meta: PapierkramTogglMeta } = {
+  const toggleImportComment: { meta: TogglMetaForPapierkram } = {
     meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
   }
 
@@ -27,7 +29,7 @@ test(`Given a list of imported papierkram time entries
   ]
 
   const papierkramTimeEntryImportedFromToggl = papierkramTimeEntries
-    .map(createPapierkramTimeEntryWithTogglImportInformation)
+    .map(parseTogglMetaFromPapierkramTimeEntryComments)
     .filter(timeEntry => timeEntry !== null)
 
   const togglTimeEntries = [
@@ -39,7 +41,7 @@ test(`Given a list of imported papierkram time entries
     })
   ]
 
-  const [archiveOperation] = buildPapierkramImportOperations(
+  const [archiveOperation] = determinePapierkramImportOperations(
     papierkramTimeEntryImportedFromToggl,
     togglTimeEntries
   )
@@ -51,14 +53,14 @@ test(`Given a list of toggl time entries
       When no matching papierkram time entry exists
       Then the papierkram time entry should be flagged as to be created`, () => {
   const toggleTimeEntryId = 8921379
-  const toggleImportMeta: { meta: PapierkramTogglMeta } = {
+  const toggleImportMeta: { meta: TogglMetaForPapierkram } = {
     meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
   }
   const expectedTogglMetaComment = JSON.stringify(toggleImportMeta)
   const papierkramTimeEntries: PapierkramTimeEntry[] = []
 
   const papierkramTimeEntryImportedFromToggl = papierkramTimeEntries
-    .map(createPapierkramTimeEntryWithTogglImportInformation)
+    .map(parseTogglMetaFromPapierkramTimeEntryComments)
     .filter(timeEntry => !!timeEntry)
 
   const togglTimeEntries = [
@@ -70,7 +72,7 @@ test(`Given a list of toggl time entries
     })
   ]
 
-  const [createOperation] = buildPapierkramImportOperations(
+  const [createOperation] = determinePapierkramImportOperations(
     papierkramTimeEntryImportedFromToggl,
     togglTimeEntries
   ) as [PapierkramTimeEntryCreateOperation]
@@ -84,14 +86,14 @@ test(`Given a list of toggl time entries
       And the toggl entry contains a descriptions
       Then the papierkram time entry being created should contain both the import meta data and the descriptions`, () => {
   const toggleTimeEntryId = 8921379
-  const toggleImportMeta: { meta: PapierkramTogglMeta } = {
+  const toggleImportMeta: { meta: TogglMetaForPapierkram } = {
     meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
   }
   const expectedTogglMetaComment = JSON.stringify(toggleImportMeta)
   const papierkramTimeEntries: PapierkramTimeEntry[] = []
 
   const papierkramTimeEntryImportedFromToggl = papierkramTimeEntries
-    .map(createPapierkramTimeEntryWithTogglImportInformation)
+    .map(parseTogglMetaFromPapierkramTimeEntryComments)
     .filter(timeEntry => !!timeEntry)
 
   const togglTimeEntries = [
@@ -103,7 +105,7 @@ test(`Given a list of toggl time entries
     })
   ]
 
-  const [createOperation] = buildPapierkramImportOperations(
+  const [createOperation] = determinePapierkramImportOperations(
     papierkramTimeEntryImportedFromToggl,
     togglTimeEntries
   ) as [PapierkramTimeEntryCreateOperation]
@@ -118,14 +120,13 @@ test(`Given a list of toggl time entries
       And nothing has changed
       Then no operation should be built`, () => {
   const toggleTimeEntryId = 8921379
-  const toggleImportComment: { meta: PapierkramTogglMeta } = {
+  const toggleImportComment: { meta: TogglMetaForPapierkram } = {
     meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
   }
 
   const papierkramTimeEntries = [
     createPapierkramTimeEntry({
       id: 1,
-
       comments: JSON.stringify(toggleImportComment),
       started_at: '2024-11-22T15:00:00.000+01:00',
       ended_at: '2024-11-22T15:00:00.000+01:00'
@@ -133,7 +134,7 @@ test(`Given a list of toggl time entries
   ]
 
   const papierkramTimeEntryImportedFromToggl = papierkramTimeEntries
-    .map(createPapierkramTimeEntryWithTogglImportInformation)
+    .map(parseTogglMetaFromPapierkramTimeEntryComments)
     .filter(timeEntry => !!timeEntry)
 
   const togglTimeEntries = [
@@ -145,7 +146,7 @@ test(`Given a list of toggl time entries
     })
   ]
 
-  const operations = buildPapierkramImportOperations(
+  const operations = determinePapierkramImportOperations(
     papierkramTimeEntryImportedFromToggl,
     togglTimeEntries
   ) as [PapierkramTimeEntryCreateOperation]
@@ -159,14 +160,13 @@ test(`Given a list of toggl time entries
       Then the papierkram time entry should be marked as to be updated
       And contain the updated start`, () => {
   const toggleTimeEntryId = 8921379
-  const toggleImportComment: { meta: PapierkramTogglMeta } = {
+  const toggleImportComment: { meta: TogglMetaForPapierkram } = {
     meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
   }
 
   const papierkramTimeEntries = [
     createPapierkramTimeEntry({
       id: 1,
-
       comments: JSON.stringify(toggleImportComment),
       started_at: '2024-11-22T15:00:00.000+01:00',
       ended_at: '2024-11-22T16:00:00.000+01:00'
@@ -174,7 +174,7 @@ test(`Given a list of toggl time entries
   ]
 
   const papierkramTimeEntryImportedFromToggl = papierkramTimeEntries
-    .map(createPapierkramTimeEntryWithTogglImportInformation)
+    .map(parseTogglMetaFromPapierkramTimeEntryComments)
     .filter(timeEntry => !!timeEntry)
 
   const togglTimeEntries = [
@@ -186,7 +186,7 @@ test(`Given a list of toggl time entries
     })
   ]
 
-  const [updateOperation] = buildPapierkramImportOperations(
+  const [updateOperation] = determinePapierkramImportOperations(
     papierkramTimeEntryImportedFromToggl,
     togglTimeEntries
   ) as [PapierkramTimeEntryUpdateOperation]
@@ -201,14 +201,13 @@ test(`Given a list of toggl time entries
       Then the papierkram time entry should be marked as to be updated
       And contain the updated end`, () => {
   const toggleTimeEntryId = 8921379
-  const toggleImportComment: { meta: PapierkramTogglMeta } = {
+  const toggleImportComment: { meta: TogglMetaForPapierkram } = {
     meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
   }
 
   const papierkramTimeEntries = [
     createPapierkramTimeEntry({
       id: 1,
-
       comments: JSON.stringify(toggleImportComment),
       started_at: '2024-11-22T15:00:00.000+01:00',
       ended_at: '2024-11-22T16:00:00.000+01:00'
@@ -216,7 +215,7 @@ test(`Given a list of toggl time entries
   ]
 
   const papierkramTimeEntryImportedFromToggl = papierkramTimeEntries
-    .map(createPapierkramTimeEntryWithTogglImportInformation)
+    .map(parseTogglMetaFromPapierkramTimeEntryComments)
     .filter(timeEntry => !!timeEntry)
 
   const togglTimeEntries = [
@@ -228,7 +227,7 @@ test(`Given a list of toggl time entries
     })
   ]
 
-  const [updateOperation] = buildPapierkramImportOperations(
+  const [updateOperation] = determinePapierkramImportOperations(
     papierkramTimeEntryImportedFromToggl,
     togglTimeEntries
   ) as [PapierkramTimeEntryUpdateOperation]
@@ -244,14 +243,13 @@ test(`Given a list of toggl time entries
   Then the papierkram time entry should be marked as to be updated
   And contain the updated end`, () => {
   const toggleTimeEntryId = 8921379
-  const toggleImportComment: { meta: PapierkramTogglMeta } = {
+  const toggleImportComment: { meta: TogglMetaForPapierkram } = {
     meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
   }
 
   const papierkramTimeEntries = [
     createPapierkramTimeEntry({
       id: 1,
-
       comments: JSON.stringify(toggleImportComment),
       started_at: '2024-11-22T15:00:00.000+01:00',
       ended_at: '2024-11-22T16:00:00.000+01:00'
@@ -259,7 +257,7 @@ test(`Given a list of toggl time entries
   ]
 
   const papierkramTimeEntryImportedFromToggl = papierkramTimeEntries
-    .map(createPapierkramTimeEntryWithTogglImportInformation)
+    .map(parseTogglMetaFromPapierkramTimeEntryComments)
     .filter(timeEntry => !!timeEntry)
 
   const togglTimeEntries = [
@@ -271,7 +269,7 @@ test(`Given a list of toggl time entries
     })
   ]
 
-  const [updateOperation] = buildPapierkramImportOperations(
+  const [updateOperation] = determinePapierkramImportOperations(
     papierkramTimeEntryImportedFromToggl,
     togglTimeEntries
   ) as [PapierkramTimeEntryUpdateOperation]
@@ -288,7 +286,7 @@ test(`Given a list of toggl time entries
   Then the papierkram time entry should be marked as to be updated
   And contain the updated comment`, () => {
   const toggleTimeEntryId = 8921379
-  const toggleImportComment: { meta: PapierkramTogglMeta } = {
+  const toggleImportComment: { meta: TogglMetaForPapierkram } = {
     meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
   }
 
@@ -305,7 +303,7 @@ test(`Given a list of toggl time entries
   ]
 
   const papierkramTimeEntryImportedFromToggl = papierkramTimeEntries
-    .map(createPapierkramTimeEntryWithTogglImportInformation)
+    .map(parseTogglMetaFromPapierkramTimeEntryComments)
     .filter(timeEntry => !!timeEntry)
 
   const togglTimeEntries = [
@@ -317,7 +315,7 @@ test(`Given a list of toggl time entries
     })
   ]
 
-  const [updateOperation] = buildPapierkramImportOperations(
+  const [updateOperation] = determinePapierkramImportOperations(
     papierkramTimeEntryImportedFromToggl,
     togglTimeEntries
   ) as [PapierkramTimeEntryUpdateOperation]
@@ -333,163 +331,31 @@ test(`Given a list of toggl time entries
   })
 })
 
-export function createTogglTimeEntry(props: TogglTimeEntry) {
-  return { ...props }
-}
-
-export type PapierkramImportOperation =
-  | PapierkramTimeEntryCreateOperation
-  | PapierkramTimeEntryUpdateOperation
-  | PapierkramTimeEntryArchiveOperation
-
-function createPapierkramTimeEntryComments(props: TogglTimeEntry): string {
-  const meta = {
-    meta: <PapierkramTogglMeta>{ toggl: { timeEntry: { id: props.id } } }
+test(`Given a list of toggl time entries
+  When a matching papierkram time entry exists
+  And the matching toggle time entry has no comment
+  Then the papierkram time entry should be marked as to be created
+  And contain the id of the toggl time entry`, () => {
+  const toggleTimeEntryId = 8921379
+  const toggleImportComment: { meta: TogglMetaForPapierkram } = {
+    meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
   }
 
-  return props.description
-    ? `${props.description}\n\n---\n\n${JSON.stringify(meta)}`
-    : JSON.stringify(meta)
-}
-
-type PapierkramTimeEntryCreateOperation = {
-  type: 'create'
-  payload: PapierkramTimeEntryCreateDto
-}
-
-type PapierkramTimeEntryUpdateOperation = {
-  type: 'update'
-  timeEntryId: number
-  payload: PapierkramTimeEntryUpdateDto
-}
-
-type PapierkramTimeEntryArchiveOperation = {
-  type: 'archive'
-  timeEntryId: number
-}
-
-type PapierkramTimeEntryCreateDto = {
-  entry_date: string
-  started_at_time: string
-  ended_at_time: string
-  comments: string
-}
-
-type PapierkramTimeEntryUpdateDto = Partial<PapierkramTimeEntryCreateDto>
-
-export function buildPapierkramImportOperations(
-  papierkram: PapierkramTimeEntryImportedFromToggl[],
-  toggl: TogglTimeEntry[]
-): PapierkramImportOperation[] {
-  // Find time entries in papierkram that has been deleted in toggle to archive them.
-  const archiveOperations: PapierkramTimeEntryArchiveOperation[] = papierkram
-    .filter(
-      papierkramTimeEntry =>
-        !toggl.some(
-          togglTimeEntry =>
-            togglTimeEntry.id === papierkramTimeEntry.meta.toggl.timeEntry.id
-        )
-    )
-    .map(papierkramTimeEntry => ({
-      type: 'archive' as const,
-      timeEntryId: papierkramTimeEntry.id
-    }))
-
-  // Find toggl time entries that need to be created in papierkram
-  const createOperations: PapierkramTimeEntryCreateOperation[] = toggl
-    .filter(
-      togglTimeEntry =>
-        !papierkram.some(
-          papierkramTimeEntry =>
-            papierkramTimeEntry.meta.toggl.timeEntry.id == togglTimeEntry.id
-        )
-    )
-    .map(togglTimeEntry => {
-      const start = parseISO(togglTimeEntry.start)
-      const end = parseISO(togglTimeEntry.stop)
-
-      return {
-        type: 'create' as const,
-        payload: {
-          entry_date: format(start, 'yyyy-MM-dd'),
-          started_at_time: format(start, 'HH:mm'),
-          ended_at_time: format(end, 'HH:mm'),
-          comments: createPapierkramTimeEntryComments(togglTimeEntry)
-        }
-      }
+  const togglTimeEntries = [
+    createTogglTimeEntry({
+      id: toggleTimeEntryId,
+      description: '',
+      start: '2024-11-22T14:00:00.000+00Z',
+      stop: '2024-11-22T15:00:00.000+00Z'
     })
+  ]
 
-  // Find toggl time entries that need to be updated in papierkram
-  const updateOperations: PapierkramTimeEntryUpdateOperation[] = toggl
-    .map(togglTimeEntry => {
-      const papierkramTimeEntry = papierkram.find(
-        papierkramTimeEntry =>
-          papierkramTimeEntry.meta.toggl.timeEntry.id == togglTimeEntry.id
-      )
+  const [updateOperation] = determinePapierkramImportOperations(
+    [],
+    togglTimeEntries
+  ) as [PapierkramTimeEntryUpdateOperation]
 
-      return {
-        timeEntryPair: {
-          toggl: togglTimeEntry,
-          papierkram: papierkramTimeEntry
-        }
-      }
-    })
-    .filter(
-      (
-        value
-      ): value is {
-        timeEntryPair: {
-          toggl: TogglTimeEntry
-          papierkram: PapierkramTimeEntryImportedFromToggl
-        }
-      } => !!value.timeEntryPair.papierkram
-    )
-    .map(({ timeEntryPair }) => {
-      const updateRecord: Partial<
-        Record<keyof PapierkramTimeEntryUpdateDto, string>
-      > = {}
-      const papierkramStartedAt = parseISO(timeEntryPair.papierkram.started_at)
-      const togglStartedAt = parseISO(timeEntryPair.toggl.start)
-
-      const startDifference = differenceInSeconds(
-        papierkramStartedAt,
-        togglStartedAt
-      )
-
-      const papierkramEndedAt = parseISO(timeEntryPair.papierkram.ended_at)
-      const togglEndedAt = parseISO(timeEntryPair.toggl.stop)
-
-      const endDifference = differenceInSeconds(papierkramEndedAt, togglEndedAt)
-
-      if (startDifference !== 0) {
-        updateRecord.started_at_time = format(togglStartedAt, 'HH:mm')
-      }
-
-      if (endDifference !== 0) {
-        updateRecord.ended_at_time = format(togglEndedAt, 'HH:mm')
-      }
-
-      if (!isSameDay(papierkramStartedAt, togglStartedAt)) {
-        updateRecord.entry_date = format(togglStartedAt, 'yyyy-MM-dd')
-      }
-
-      const comments = createPapierkramTimeEntryComments(timeEntryPair.toggl)
-      if (comments !== timeEntryPair.papierkram.comments) {
-        updateRecord.comments = comments
-      }
-
-      return startDifference !== 0 ||
-        endDifference !== 0 ||
-        !isSameDay(papierkramStartedAt, togglStartedAt) ||
-        comments !== timeEntryPair.papierkram.comments
-        ? {
-            type: 'update' as const,
-            timeEntryId: timeEntryPair.papierkram.id,
-            payload: updateRecord
-          }
-        : null
-    })
-    .filter(operation => !!operation)
-
-  return [...archiveOperations, ...createOperations, ...updateOperations]
-}
+  expect(updateOperation.payload.comments).toBe(
+    `\n\n---\n\n${JSON.stringify(toggleImportComment)}`
+  )
+})
