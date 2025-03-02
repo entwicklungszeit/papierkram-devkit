@@ -8,7 +8,7 @@ import {
 } from '../../types/papierkram-import-operation'
 import { differenceInSeconds, format, isSameDay, parseISO } from 'date-fns'
 import { PapierkramTimeEntryUpdateDto } from '../../types/papierkram-time-entry-update.dto'
-import { TogglMetaForPapierkram } from './types/toggl-meta-for-papierkram'
+import { createPapierkramTimeEntryComments } from './create-papierkram-time-entry-comments'
 
 export function determinePapierkramImportOperations(
   papierkram: PapierkramTimeEntryImportedFromToggl[],
@@ -125,17 +125,4 @@ export function determinePapierkramImportOperations(
     .filter(operation => !!operation)
 
   return [...archiveOperations, ...createOperations, ...updateOperations]
-}
-
-function createPapierkramTimeEntryComments(
-  props: TogglTimeEntry,
-  seperator = '\n\n---\n\n'
-): string {
-  const meta = {
-    meta: <TogglMetaForPapierkram>{ toggl: { timeEntry: { id: props.id } } }
-  }
-
-  return props.description
-    ? `${props.description}${seperator}{JSON.stringify(meta)}`
-    : `${seperator}${JSON.stringify(meta)}`
 }

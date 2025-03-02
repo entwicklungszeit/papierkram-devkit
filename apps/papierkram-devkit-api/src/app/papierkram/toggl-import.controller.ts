@@ -1,4 +1,4 @@
-import { Controller, Post } from '@nestjs/common'
+import { Body, Controller, Post } from '@nestjs/common'
 import { TimeFrame } from '../utils/time-frame'
 import { PapierkramImporter } from './papierkram-importer.service'
 import { PapierkramImportOperationBuilder } from './papierkram-import-operation-builder.service'
@@ -15,14 +15,14 @@ export class TogglImportController {
   ) {}
 
   @Post()
-  async import(timeFrame: TimeFrame) {
-    const [togglTimeEntries, papierkramTimeEntries] = await Promise.all([
+  async import(@Body() timeFrame: TimeFrame) {
+    const [togglResponse, papierkramTimeEntries] = await Promise.all([
       this.togglReadClient.readTimeEntries(timeFrame),
       this.papierkramReadClient.readTimeEntries(timeFrame)
     ])
 
     const importOperations = this.importOperationBuilder.buildWithToggl({
-      togglTimeEntries,
+      togglTimeEntries: togglResponse.data,
       papierkramTimeEntries
     })
 
