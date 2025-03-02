@@ -12,9 +12,7 @@ export class TogglImportController {
     private readonly papierkramReadClient: PapierkramReadClient,
     private readonly importOperationBuilder: PapierkramImportOperationBuilder,
     private readonly importer: PapierkramImporter
-  ) {
-    console.log(togglReadClient)
-  }
+  ) {}
 
   @Post()
   async import(timeFrame: TimeFrame) {

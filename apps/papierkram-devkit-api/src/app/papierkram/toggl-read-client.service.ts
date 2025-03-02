@@ -7,9 +7,7 @@ import { TogglTimeEntry } from './importers/toggl/types/toggl-time-entry'
 export class TogglReadClient {
   #logger = new Logger(TogglReadClient.name)
 
-  constructor(private readonly config: ConfigService) {
-    console.log(config)
-  }
+  constructor(private readonly config: ConfigService) {}
 
   readTimeEntries(timeFrame: TimeFrame): Promise<TogglTimeEntry[]> {
     this.#logger.log(this.config.get('toggl_api_url'))

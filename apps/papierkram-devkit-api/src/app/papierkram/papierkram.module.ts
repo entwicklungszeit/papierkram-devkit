@@ -4,7 +4,7 @@ import { PapierkramImporter } from './papierkram-importer.service'
 import { TogglReadClient } from './toggl-read-client.service'
 import { PapierkramReadClient } from './papierkram-read-client.service'
 import { PapierkramImportOperationBuilder } from './papierkram-import-operation-builder.service'
-import { ConfigModule, ConfigService } from '@nestjs/config'
+import { ConfigModule } from '@nestjs/config'
 
 @Module({
   imports: [ConfigModule.forRoot()],
@@ -16,8 +16,4 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
     PapierkramImportOperationBuilder
   ]
 })
-export class PapierkramModule {
-  constructor(private readonly configService: ConfigService) {
-    console.log('ctor', this.configService)
-  }
-}
+export class PapierkramModule {}

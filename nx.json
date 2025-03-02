@@ -34,7 +34,9 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/papierkram-toggl-connector-e2e/**/*"]
+      "exclude": [
+        "apps/papierkram-devkit-api-e2e/**/*"
+      ]
     },
     {
       "plugin": "@nx/vite/plugin",
