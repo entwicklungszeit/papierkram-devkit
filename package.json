@@ -2,7 +2,9 @@
   "name": "@papierkram-devkit/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start": "pnpm dotenvx run --env-file=apps/papierkram-devkit-api/.env -- npx nx serve papierkram-devkit-api"
+  },
   "private": true,
   "dependencies": {
     "@date-fns/tz": "^1.2.0",
