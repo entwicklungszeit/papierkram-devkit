@@ -19,26 +19,28 @@ class PapierkramReadClient {
   }
 }
 
-class PapierkramImportClient {
-  import({
-    togglTimeEntries,
-    papierkramTimeEntries
-  }: {
+class PapierkramImportOperationBuilder {
+  buildWithToggl(props: {
     togglTimeEntries: TogglTimeEntry[]
     papierkramTimeEntries: PapierkramTimeEntry[]
-  }): Promise<void> {
-    // Iterate through operations
-    // Execute correct API call based on the given operation
+  }): PapierkramImportOperation[] {
+    return []
+  }
+}
+
+export class PapierkramImporter {
+  async import(importOperations: PapierkramImportOperation[]) {
     return Promise.resolve()
   }
 }
 
-@Controller('toggle-imports')
+@Controller('toggl-imports')
 export class ToggleImportController {
   constructor(
     private readonly togglReadClient: TogglReadClient,
     private readonly papierkramReadClient: PapierkramReadClient,
-    private readonly papierkramImportClient: PapierkramImportClient
+    private readonly importOperationBuilder: PapierkramImportOperationBuilder,
+    private readonly importer: PapierkramImporter
   ) {}
 
   @Post()
@@ -48,14 +50,11 @@ export class ToggleImportController {
       this.papierkramReadClient.readTimeEntries(timeFrame)
     ])
 
-    await this.papierkramImportClient.import({
+    const importOperations = this.importOperationBuilder.buildWithToggl({
       togglTimeEntries,
       papierkramTimeEntries
     })
 
-    // 1. load time entries from both platforms
-    // 1.1 Yield error if timeEntries could not be loaded
-    // 2 Determine import operations
-    // 3 Execute import
+    await this.importer.import(importOperations)
   }
 }
