@@ -50,7 +50,7 @@ pnpm start # you need to have the private key for the encrypted .env-file
 ### Trigger import from Toggl
 
 ```http request
-POST http://localhost:3000/api/toggl-imports
+POST http://localhost:3000/api/imports/toggl
 
 {
   "from": "2025-02-17",

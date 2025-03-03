@@ -1,5 +1,5 @@
 export default {
-  displayName: 'papierkram-devkit-api-e2e',
+  displayName: 'papierkram-api-devkit-api-e2e',
   preset: '../../jest.preset.js',
   globalSetup: '<rootDir>/src/support/global-setup.ts',
   globalTeardown: '<rootDir>/src/support/global-teardown.ts',
@@ -14,5 +14,5 @@ export default {
     ]
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/papierkram-devkit-api-e2e'
+  coverageDirectory: '../../coverage/papierkram-api-devkit-api-e2e'
 }

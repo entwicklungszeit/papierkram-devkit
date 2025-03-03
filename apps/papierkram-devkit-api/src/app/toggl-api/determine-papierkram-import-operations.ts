@@ -5,16 +5,16 @@ import {
   PapierkramTimeEntryArchiveOperation,
   PapierkramTimeEntryCreateOperation,
   PapierkramTimeEntryUpdateOperation
-} from '../../types/papierkram-import-operation'
+} from '../papierkram-api/types/papierkram-import-operation'
 import { differenceInSeconds, format, isSameDay, parseISO } from 'date-fns'
-import { PapierkramTimeEntryUpdateDto } from '../../types/papierkram-time-entry-update.dto'
+import { PapierkramTimeEntryUpdateDto } from '../papierkram-api/types/papierkram-time-entry-update.dto'
 import { createPapierkramTimeEntryComments } from './create-papierkram-time-entry-comments'
 
 export function determinePapierkramImportOperations(
   papierkram: PapierkramTimeEntryImportedFromToggl[],
   toggl: TogglTimeEntry[]
 ): PapierkramImportOperation[] {
-  // Find time entries in papierkram that has been deleted in toggle to archive them.
+  // Find time entries in papierkram-api that has been deleted in toggle to archive them.
   const archiveOperations: PapierkramTimeEntryArchiveOperation[] = papierkram
     .filter(
       papierkramTimeEntry =>
@@ -28,7 +28,7 @@ export function determinePapierkramImportOperations(
       timeEntryId: papierkramTimeEntry.id
     }))
 
-  // Find toggl time entries that need to be created in papierkram
+  // Find toggl time entries that need to be created in papierkram-api
   const createOperations: PapierkramTimeEntryCreateOperation[] = toggl
     .filter(
       togglTimeEntry =>
@@ -52,7 +52,7 @@ export function determinePapierkramImportOperations(
       }
     })
 
-  // Find toggl time entries that need to be updated in papierkram
+  // Find toggl time entries that need to be updated in papierkram-api
   const updateOperations: PapierkramTimeEntryUpdateOperation[] = toggl
     .map(togglTimeEntry => {
       const papierkramTimeEntry = papierkram.find(

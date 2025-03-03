@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
-import { PapierkramModule } from './papierkram/papierkram.module'
+import { ImportsModule } from './imports.module'
 
 @Module({
-  imports: [PapierkramModule]
+  imports: [ImportsModule]
 })
 export class AppModule {}

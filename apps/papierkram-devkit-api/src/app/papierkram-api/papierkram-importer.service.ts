@@ -46,7 +46,7 @@ export class PapierkramImporter {
         },
         {
           headers: {
-            Accept: 'application/json', // without papierkram yields 406 Not Acceptable
+            Accept: 'application/json', // without papierkram-api yields 406 Not Acceptable
             Authorization: `Bearer ${this.options.apiToken}`
           }
         }

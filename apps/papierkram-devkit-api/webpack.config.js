@@ -3,7 +3,7 @@ const { join } = require('path')
 
 module.exports = {
   output: {
-    path: join(__dirname, '../../dist/apps/papierkram-devkit-api')
+    path: join(__dirname, '../../dist/apps/papierkram-api-devkit-api')
   },
   plugins: [
     new NxAppWebpackPlugin({

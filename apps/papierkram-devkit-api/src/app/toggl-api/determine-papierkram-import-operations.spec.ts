@@ -1,14 +1,14 @@
 import { expect, test } from 'vitest'
-import { PapierkramTimeEntry } from '../../types/papierkram-time-entry'
+import { PapierkramTimeEntry } from '../papierkram-api/types/papierkram-time-entry'
 import { TogglTimeEntry } from './types/toggl-time-entry'
 import { TogglMetaForPapierkram } from './types/toggl-meta-for-papierkram'
-import { createPapierkramTimeEntry } from '../../types/create-papierkram-time-entry'
+import { createPapierkramTimeEntry } from '../papierkram-api/types/create-papierkram-time-entry'
 import { parseTogglMetaFromPapierkramTimeEntryComments } from './parse-toggl-meta-from-papierkram-time-entry.comments'
 import { createTogglTimeEntry } from './create-toggl-time-entry'
 import {
   PapierkramTimeEntryCreateOperation,
   PapierkramTimeEntryUpdateOperation
-} from '../../types/papierkram-import-operation'
+} from '../papierkram-api/types/papierkram-import-operation'
 import { determinePapierkramImportOperations } from './determine-papierkram-import-operations'
 
 test(`Given a list of imported papierkram time entries
