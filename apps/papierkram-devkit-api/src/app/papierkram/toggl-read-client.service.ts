@@ -3,15 +3,8 @@ import { ConfigService } from '@nestjs/config'
 import { HttpService } from '@nestjs/axios'
 import { TimeFrame } from '../utils/time-frame'
 import { TogglTimeEntry } from './importers/toggl/types/toggl-time-entry'
-import { formatDate } from 'date-fns'
 import { AxiosResponse } from 'axios'
-
-function toDateOnly(timeFrame: TimeFrame) {
-  return {
-    from: formatDate(timeFrame.from, 'yyyy-MM-dd'),
-    to: formatDate(timeFrame.to, 'yyyy-MM-dd')
-  }
-}
+import { toDateOnly } from '../utils/to-date-only'
 
 @Injectable()
 export class TogglReadClient {
@@ -38,9 +31,9 @@ export class TogglReadClient {
     timeFrame: TimeFrame
   ): Promise<AxiosResponse<TogglTimeEntry[]>> {
     const { from, to } = toDateOnly(timeFrame)
-    this.logger.log(this.config.get('toggl_api_url'))
+
     return this.httpClient.axiosRef.get(
-      `${this.options.apiUrl}/me/time_entries?from=${from}&to=${to}`,
+      `${this.options.apiUrl}/me/time_entries?start_date=${from}&end_date=${to}`,
       {
         auth: {
           username: this.options.username,
