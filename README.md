@@ -10,6 +10,12 @@ This allows to write invoices in Papierkram and automatically attaching the impo
 
 Furthermore, the Dashboard in Papierkram gets updated to visualize how much money has been earned.
 
+### Features
+
+- ✅ Create new Papierkram TimeEntries from Toggl TimeEntries
+- ✅ Update Papierkram TimeEntries being imported form Toggl
+- ✅ Archive Papierkram TimeEntries that has been removed in Toogl
+
 ### Prerequisites
 
 #### pnpm
