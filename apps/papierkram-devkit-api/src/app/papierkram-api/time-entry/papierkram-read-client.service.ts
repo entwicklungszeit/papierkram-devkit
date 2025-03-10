@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common'
-import { TimeFrame } from '../utils/time-frame'
-import { PapierkramTimeEntry } from './types/papierkram-time-entry'
+import { TimeFrame } from '../../utils/time-frame'
+import { PapierkramTimeEntry } from '../types/papierkram-time-entry'
 import { AxiosResponse } from 'axios'
 import { HttpService } from '@nestjs/axios'
 import { ConfigService } from '@nestjs/config'
-import { toDateOnly } from '../utils/to-date-only'
+import { toDateOnly } from '../../utils/to-date-only'
 
 @Injectable()
-export class PapierkramReadClient {
+export class PapierkramTimeEntryReadClient {
   private options = {
     apiUrl: '',
     apiToken: '',

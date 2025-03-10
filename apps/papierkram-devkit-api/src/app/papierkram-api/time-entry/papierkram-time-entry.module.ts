@@ -7,6 +7,7 @@ import { PapierkramTimeEntryImporter } from './papierkram-time-entry-importer.se
 import { PapierkramTimeEntryUpdateOperationClient } from './papierkram-time-entry-update-operation-client.service'
 import { PapierkramTimeEntryDeleteOperationClient } from './papierkram-time-entry-archive-operation-client.service'
 import { PapierkramTimeEntryOperationClientToken } from './papierkram-time-entry-operation-client.token'
+import { PapierkramTimeEntryReadClient } from './papierkram-read-client.service'
 
 @Module({
   imports: [ConfigModule.forRoot(), HttpModule],
@@ -28,10 +29,12 @@ import { PapierkramTimeEntryOperationClientToken } from './papierkram-time-entry
         PapierkramTimeEntryUpdateOperationClient,
         PapierkramTimeEntryDeleteOperationClient
       ]
-    }
+    },
+    PapierkramTimeEntryReadClient
   ],
   exports: [
     PapierkramTimeEntryImporter,
+    PapierkramTimeEntryReadClient,
     PapierkramTimeEntryOperationClientToken
   ]
 })
