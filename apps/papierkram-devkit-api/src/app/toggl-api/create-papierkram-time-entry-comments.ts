@@ -2,7 +2,7 @@ import { TogglTimeEntry } from './types/toggl-time-entry'
 import { TogglMetaForPapierkram } from './types/toggl-meta-for-papierkram'
 
 export function createPapierkramTimeEntryComments(
-  props: TogglTimeEntry,
+  props: Partial<TogglTimeEntry>,
   seperator = '\n\n---\n\n'
 ): string {
   const meta = {
@@ -11,5 +11,5 @@ export function createPapierkramTimeEntryComments(
 
   return !props.description && !props.id
     ? ''
-    : `${props.description}${seperator}${JSON.stringify(meta)}`
+    : `${props.description || ''}${seperator}${JSON.stringify(meta)}`
 }

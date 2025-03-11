@@ -7,6 +7,7 @@ import {
   PapierkramTimeEntryUpdateOperation
 } from '@papierkram/api'
 import { determinePapierkramImportOperations } from './determine-papierkram-import-operations'
+import { createPapierkramTimeEntryComments } from './create-papierkram-time-entry-comments'
 
 test(`Given a list of imported papierkram time entries
       When have no matching toggl time entry
@@ -106,15 +107,12 @@ test(`Given a list of toggl time entries
       When no matching papierkram time entry exists
       And nothing has changed
       Then no operation should be built`, () => {
-  const toggleTimeEntryId = 8921379
-  const toggleImportComment: { meta: TogglMetaForPapierkram } = {
-    meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
-  }
+  const togglTimeEntryId = 8921379
 
   const papierkramTimeEntries = [
     createPapierkramTimeEntry({
       id: 1,
-      comments: JSON.stringify(toggleImportComment),
+      comments: createPapierkramTimeEntryComments({ id: togglTimeEntryId }),
       started_at: '2024-11-22T15:00:00.000+01:00',
       ended_at: '2024-11-22T15:00:00.000+01:00'
     })
@@ -126,7 +124,7 @@ test(`Given a list of toggl time entries
 
   const togglTimeEntries = [
     createTogglTimeEntry({
-      id: toggleTimeEntryId,
+      id: togglTimeEntryId,
       description: '',
       start: '2024-11-22T15:00:00.000+01:00',
       stop: '2024-11-22T15:00:00.000+01:00'

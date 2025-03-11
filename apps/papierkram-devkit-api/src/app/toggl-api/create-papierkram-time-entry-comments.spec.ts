@@ -48,3 +48,18 @@ test(`Given a Toggl Time Entry
 
   expect(comments).toBe('')
 })
+
+test(`Given a Toggl Time Entry
+      When the description is undefined
+      Then the the comment does not contained "undefined" as text`, () => {
+  const togglTimeEntry = createTogglTimeEntry({
+    id: 1,
+    description: undefined as unknown as string,
+    start: '',
+    stop: ''
+  })
+
+  const comments = createPapierkramTimeEntryComments(togglTimeEntry)
+
+  expect(comments).not.toContain('undefined')
+})
