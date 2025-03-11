@@ -63,3 +63,9 @@ POST http://localhost:3000/api/imports/toggl
   "to": "2025-02-23"
 }
 ```
+
+### Run tests
+
+```
+pnpm nx run papierkram-devkit-api:test
+```
