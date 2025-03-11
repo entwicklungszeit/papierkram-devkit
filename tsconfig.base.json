@@ -16,11 +16,11 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@toggl/api": [
-        "apps/papierkram-devkit-api/src/app/toggl-api/public-api.ts"
-      ],
       "@papierkram/api": [
         "apps/papierkram-devkit-api/src/app/papierkram-api/public-api.ts"
+      ],
+      "@toggl/api": [
+        "apps/papierkram-devkit-api/src/app/toggl-api/public-api.ts"
       ]
     }
   },
