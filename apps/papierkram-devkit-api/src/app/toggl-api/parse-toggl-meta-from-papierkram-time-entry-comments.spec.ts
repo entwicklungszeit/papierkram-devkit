@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { TogglMetaForPapierkram } from './types/toggl-meta-for-papierkram'
-import { createPapierkramTimeEntry } from '../papierkram-api/types/create-papierkram-time-entry'
+import { createPapierkramTimeEntry } from '../papierkram-api/time-entry/create-papierkram-time-entry'
 import { parseTogglMetaFromPapierkramTimeEntryComments } from './parse-toggl-meta-from-papierkram-time-entry.comments'
 
 test(`Given papierkram time entry

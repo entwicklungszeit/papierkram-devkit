@@ -1,4 +1,4 @@
-import { PapierkramTimeEntry } from './papierkram-time-entry'
+import { PapierkramTimeEntry } from '../types/papierkram-time-entry'
 
 export function createPapierkramTimeEntry(
   props: PapierkramTimeEntry

@@ -1,14 +1,11 @@
-import { expect, test } from 'vitest'
-import { PapierkramTimeEntry } from '../papierkram-api/types/papierkram-time-entry'
-import { TogglTimeEntry } from './types/toggl-time-entry'
 import { TogglMetaForPapierkram } from './types/toggl-meta-for-papierkram'
-import { createPapierkramTimeEntry } from '../papierkram-api/types/create-papierkram-time-entry'
 import { parseTogglMetaFromPapierkramTimeEntryComments } from './parse-toggl-meta-from-papierkram-time-entry.comments'
 import { createTogglTimeEntry } from './create-toggl-time-entry'
 import {
+  createPapierkramTimeEntry,
   PapierkramTimeEntryCreateOperation,
   PapierkramTimeEntryUpdateOperation
-} from '../papierkram-api/types/papierkram-import-operation'
+} from '@papierkram/api'
 import { determinePapierkramImportOperations } from './determine-papierkram-import-operations'
 
 test(`Given a list of imported papierkram time entries
@@ -57,11 +54,6 @@ test(`Given a list of toggl time entries
     meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
   }
   const expectedTogglMetaComment = JSON.stringify(toggleImportMeta)
-  const papierkramTimeEntries: PapierkramTimeEntry[] = []
-
-  const papierkramTimeEntryImportedFromToggl = papierkramTimeEntries
-    .map(parseTogglMetaFromPapierkramTimeEntryComments)
-    .filter(timeEntry => !!timeEntry)
 
   const togglTimeEntries = [
     createTogglTimeEntry({
@@ -73,7 +65,7 @@ test(`Given a list of toggl time entries
   ]
 
   const [createOperation] = determinePapierkramImportOperations(
-    papierkramTimeEntryImportedFromToggl,
+    [],
     togglTimeEntries
   ) as [PapierkramTimeEntryCreateOperation]
 
@@ -90,11 +82,6 @@ test(`Given a list of toggl time entries
     meta: { toggl: { timeEntry: { id: toggleTimeEntryId } } }
   }
   const expectedTogglMetaComment = JSON.stringify(toggleImportMeta)
-  const papierkramTimeEntries: PapierkramTimeEntry[] = []
-
-  const papierkramTimeEntryImportedFromToggl = papierkramTimeEntries
-    .map(parseTogglMetaFromPapierkramTimeEntryComments)
-    .filter(timeEntry => !!timeEntry)
 
   const togglTimeEntries = [
     createTogglTimeEntry({
@@ -106,7 +93,7 @@ test(`Given a list of toggl time entries
   ]
 
   const [createOperation] = determinePapierkramImportOperations(
-    papierkramTimeEntryImportedFromToggl,
+    [],
     togglTimeEntries
   ) as [PapierkramTimeEntryCreateOperation]
 
