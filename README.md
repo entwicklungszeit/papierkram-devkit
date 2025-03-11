@@ -12,9 +12,24 @@ Furthermore, the Dashboard in Papierkram gets updated to visualize how much mone
 
 ### Features
 
-- ✅ Create new Papierkram TimeEntries from Toggl TimeEntries
-- ✅ Update Papierkram TimeEntries being imported form Toggl
-- ✅ Archive Papierkram TimeEntries that has been removed in Toogl
+- ✅ Create new Papierkram time entries from Toggl TimeEntries
+- ✅ Update Papierkram time entries being imported form Toggl
+- ✅ Archive Papierkram time entries that has been removed in Toogl
+
+### How it works?
+
+To modify a time entry that has been importet from Toggl, we need the possibility to identify which time entry in Papierkram was imported.
+That's why the `Id` of the toggl time entry written to the comment of the respective time entry.
+The toggl information are serialised to a JSON-string.
+A time entry comment in Papierkram that has been imported looks like this:
+
+```
+This is what I have done...
+
+---
+
+{"meta":{"toggl":{"timeEntry":{"id":3841295324}}}}
+```
 
 ### Prerequisites
 
