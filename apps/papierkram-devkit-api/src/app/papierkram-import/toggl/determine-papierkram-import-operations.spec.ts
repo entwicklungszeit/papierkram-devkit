@@ -1,6 +1,6 @@
 import { TogglMetaForPapierkram } from './types/toggl-meta-for-papierkram'
 import { parseTogglMetaFromPapierkramTimeEntryComments } from './parse-toggl-meta-from-papierkram-time-entry.comments'
-import { createTogglTimeEntry } from './create-toggl-time-entry'
+import { createTogglTimeEntry } from '@toggl/api'
 import {
   createPapierkramTimeEntry,
   PapierkramTimeEntryCreateOperation,

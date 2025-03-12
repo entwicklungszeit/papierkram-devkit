@@ -4,6 +4,8 @@ export { PapierkramTimeEntryImporter } from './time-entry/papierkram-time-entry-
 export { PapierkramTimeEntryModule } from './time-entry/papierkram-time-entry.module'
 
 export { PapierkramTimeEntry } from './types/papierkram-time-entry'
+export { PapierkramTimeEntryCreateDto } from './types/papierkram-time-entry-create.dto'
+export { PapierkramTimeEntryUpdateDto } from './types/papierkram-time-entry-update.dto'
 
 export {
   PapierkramImportOperation,

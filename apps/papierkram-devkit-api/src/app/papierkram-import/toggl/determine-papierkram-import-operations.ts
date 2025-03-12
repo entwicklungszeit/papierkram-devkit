@@ -1,13 +1,13 @@
 import { PapierkramTimeEntryImportedFromToggl } from './types/papierkram-time-entry-imported-from-toggl'
-import { TogglTimeEntry } from './types/toggl-time-entry'
+import { TogglTimeEntry } from '@toggl/api'
 import {
   PapierkramImportOperation,
   PapierkramTimeEntryArchiveOperation,
   PapierkramTimeEntryCreateOperation,
   PapierkramTimeEntryUpdateOperation
-} from '../papierkram-api/types/papierkram-import-operation'
+} from '@papierkram/api'
 import { differenceInSeconds, format, isSameDay, parseISO } from 'date-fns'
-import { PapierkramTimeEntryUpdateDto } from '../papierkram-api/types/papierkram-time-entry-update.dto'
+import { PapierkramTimeEntryUpdateDto } from '@papierkram/api'
 import { createPapierkramTimeEntryComments } from './create-papierkram-time-entry-comments'
 
 export function determinePapierkramImportOperations(

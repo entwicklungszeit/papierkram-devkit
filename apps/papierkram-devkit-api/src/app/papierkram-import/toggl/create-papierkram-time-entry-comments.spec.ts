@@ -1,4 +1,4 @@
-import { createTogglTimeEntry } from './create-toggl-time-entry'
+import { createTogglTimeEntry } from '@toggl/api'
 import { createPapierkramTimeEntryComments } from './create-papierkram-time-entry-comments'
 
 test(`Given a Toggl Time Entry without description

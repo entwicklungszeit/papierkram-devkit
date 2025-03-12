@@ -19,6 +19,9 @@
       "@papierkram/api": [
         "apps/papierkram-devkit-api/src/app/papierkram-api/public-api.ts"
       ],
+      "@papierkram/import": [
+        "apps/papierkram-devkit-api/src/app/papierkram-import/public-api.ts"
+      ],
       "@toggl/api": [
         "apps/papierkram-devkit-api/src/app/toggl-api/public-api.ts"
       ]

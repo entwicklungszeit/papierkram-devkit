@@ -1,4 +1,4 @@
-import { TogglTimeEntry } from './types/toggl-time-entry'
+import { TogglTimeEntry } from '@toggl/api'
 import { TogglMetaForPapierkram } from './types/toggl-meta-for-papierkram'
 
 export function createPapierkramTimeEntryComments(

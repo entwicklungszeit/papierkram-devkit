@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
-import { TogglTimeEntry } from './types/toggl-time-entry'
-import { PapierkramTimeEntry } from '../papierkram-api/types/papierkram-time-entry'
-import { PapierkramImportOperation } from '../papierkram-api/types/papierkram-import-operation'
+import { TogglTimeEntry } from '@toggl/api'
+import { PapierkramTimeEntry, PapierkramImportOperation } from '@papierkram/api'
 import { determinePapierkramImportOperations } from './determine-papierkram-import-operations'
 import { parseTogglMetaFromPapierkramTimeEntryComments } from './parse-toggl-meta-from-papierkram-time-entry.comments'
 

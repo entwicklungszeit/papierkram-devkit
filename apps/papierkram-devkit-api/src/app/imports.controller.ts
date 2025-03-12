@@ -1,13 +1,16 @@
-import { Body, Controller, Post } from '@nestjs/common'
+import { Body, Controller, Logger, Post } from '@nestjs/common'
 import {
   PapierkramTimeEntryReadClient,
   PapierkramTimeEntryImporter
 } from '@papierkram/api'
-import { PapierkramImportOperationBuilder, TogglReadClient } from '@toggl/api'
+import { PapierkramImportOperationBuilder } from '@papierkram/import'
+import { TogglReadClient } from '@toggl/api'
 import { TimeFrame } from './utils/time-frame'
 
 @Controller('imports')
 export class ImportsController {
+  private logger = new Logger('ImportsController')
+
   constructor(
     private readonly togglReadClient: TogglReadClient,
     private readonly papierkramReadClient: PapierkramTimeEntryReadClient,
@@ -30,5 +33,9 @@ export class ImportsController {
     for (const operation of importOperations) {
       await this.importer.execute(operation)
     }
+
+    this.logger.log(
+      `${importOperations.length} time entries successfully imported`
+    )
   }
 }
