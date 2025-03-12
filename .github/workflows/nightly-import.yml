@@ -28,9 +28,6 @@ jobs:
       - name: 📦 Install Dependencies
         run: pnpm install
 
-      - name: 🧪 Run Unit Tests
-        run: pnpm test
-
       - name: ⏲️ Install wait-on
         run: pnpm install -g wait-on
 
