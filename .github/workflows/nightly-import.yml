@@ -36,7 +36,7 @@ jobs:
           DOTENV_PRIVATE_KEY: ${{ secrets.DOTENV_PRIVATE_KEY_CI }} # Secret key from GitHub Secrets
         run: |
           pnpm start & # Start the API in the background
-          sleep 2 # Ensures the process starts before the wait-on command
+          sleep 60 # Ensures the process starts before the wait-on command
 
       - name: ⏲️ Wait for Server to Start
         run: wait-on http://localhost:3000/api/health --timeout 60000
