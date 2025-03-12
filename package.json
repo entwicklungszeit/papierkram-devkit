@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "pnpm dotenvx run --env-file=apps/papierkram-devkit-api/.env -- npx nx serve papierkram-devkit-api"
+    "start": "pnpm dotenvx run --env-file=apps/papierkram-devkit-api/.env -- pnpm nx serve papierkram-devkit-api",
+    "test": "pnpm nx run papierkram-devkit-api:test",
+    "e2e": "pnpm nx run papierkram-devkit-api-e2e:e2e"
   },
   "private": true,
   "dependencies": {
