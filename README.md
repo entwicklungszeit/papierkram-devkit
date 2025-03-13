@@ -33,6 +33,10 @@ This is what I have done...
 {"meta":{"toggl":{"timeEntry":{"id":3841295324}}}}
 ```
 
+> [!NOTE]
+> You may ask, why the meta data is written to the comment.
+> At the time this solution was built, Papierkram did not provide the possibility to specify custom fields or tags on time entries.
+
 **Scheduled workflow running the import**
 
 There is a [GitHub Action workflow](https://github.com/entwicklungszeit/papierkram-devkit/tree/main/.github/workflows) being executed every night to import the time entries to Papierkram.
