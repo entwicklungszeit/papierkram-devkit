@@ -3,18 +3,19 @@ import {
   PapierkramTimeEntryReadClient,
   PapierkramTimeEntryImporter
 } from '@papierkram/api'
-import { PapierkramImportOperationBuilder } from '@papierkram/import'
 import { TogglReadClient } from '@toggl/api'
-import { TimeFrame } from './utils/time-frame'
+
+import { PapierkramTimeEntryOperationBuilder } from './papierkram-import-time-entry-operation-builder.service'
+import { TimeFrame } from '../../../utils/time-frame'
 
 @Controller('imports')
-export class ImportsController {
-  private logger = new Logger('ImportsController')
+export class PapierkramImportTimeEntryController {
+  private logger = new Logger('PapierkramImportTimeEntryController')
 
   constructor(
     private readonly togglReadClient: TogglReadClient,
     private readonly papierkramReadClient: PapierkramTimeEntryReadClient,
-    private readonly importOperationBuilder: PapierkramImportOperationBuilder,
+    private readonly importOperationBuilder: PapierkramTimeEntryOperationBuilder,
     private readonly importer: PapierkramTimeEntryImporter
   ) {}
 

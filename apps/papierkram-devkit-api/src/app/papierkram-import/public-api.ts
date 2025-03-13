@@ -1,2 +1,2 @@
-export { PapierkramImportOperationBuilder } from './toggl/papierkram-import-operation-builder.service'
-export { PapierkramImportModule } from './papierkram-import.module'
+export { PapierkramTimeEntryOperationBuilder } from './toggl/time-entries/papierkram-import-time-entry-operation-builder.service'
+export { PapierkramImportTimeEntryModule } from './toggl/time-entries/papierkram-import-time-entry.module'

@@ -5,7 +5,7 @@ import { determinePapierkramImportOperations } from './determine-papierkram-impo
 import { parseTogglMetaFromPapierkramTimeEntryComments } from './parse-toggl-meta-from-papierkram-time-entry.comments'
 
 @Injectable()
-export class PapierkramImportOperationBuilder {
+export class PapierkramTimeEntryOperationBuilder {
   buildWithToggl(props: {
     togglTimeEntries: TogglTimeEntry[]
     papierkramTimeEntries: PapierkramTimeEntry[]

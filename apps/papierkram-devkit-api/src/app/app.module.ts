@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common'
-import { ImportsModule } from './imports.module'
+import { PapierkramImportTimeEntryModule } from '@papierkram/import'
+
 import { HealthController } from './health.controller'
 
 @Module({
-  imports: [ImportsModule],
+  imports: [PapierkramImportTimeEntryModule],
   controllers: [HealthController]
 })
 export class AppModule {}

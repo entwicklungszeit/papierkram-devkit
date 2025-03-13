@@ -1,7 +1,7 @@
 import { PapierkramTimeEntry } from '@papierkram/api'
 import { PapierkramTimeEntryImportedFromToggl } from './types/papierkram-time-entry-imported-from-toggl'
-import { jsonFromString } from '../../utils/json-from-string'
-import { hasOwnProperty } from '../../utils/has-own-property'
+import { jsonFromString } from '../../../utils/json-from-string'
+import { hasOwnProperty } from '../../../utils/has-own-property'
 
 export function parseTogglMetaFromPapierkramTimeEntryComments(
   timeEntry: PapierkramTimeEntry
