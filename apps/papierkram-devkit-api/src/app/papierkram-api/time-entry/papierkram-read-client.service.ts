@@ -32,6 +32,7 @@ export class PapierkramTimeEntryReadClient {
     try {
       const response = await this.httpClient.axiosRef.get<{
         entries: PapierkramTimeEntry[]
+        hasMore: boolean
       }>(
         `${this.options.apiUrl}/tracker/time_entries?project_id=${this.options.projectId}&start_time_range_start=${from}&start_time_range_end=${to}`,
         {
@@ -42,7 +43,7 @@ export class PapierkramTimeEntryReadClient {
         }
       )
 
-      if (response.data.entries.length > 100)
+      if (response.data.hasMore)
         throw new Error(
           'Not Supported, yet - Not all time entries could be loaded within one request. Please shrink the time range to get fewer results in order to be able to compare time entries safely.'
         )
