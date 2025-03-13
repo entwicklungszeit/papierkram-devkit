@@ -1,26 +1,16 @@
-import { Inject, Injectable } from '@nestjs/common'
-import { PapierkramTimeEntryOperationClient } from './papierkram-time-entry-operation-client'
-import { PapierkramTimeEntryOperationClientToken } from './papierkram-time-entry-operation-client.token'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import { PapierkramImportOperation } from '@papierkram/api'
 
-/*
- *  Strategy Pattern Exploration
- *  This service implements the strategy pattern.
- *  However, this is considered a nice try but is not the perfect solution.
- *  Goal: Embrace NestJS's IoC to resolve the needed strategy
- *  Implementation:
- *  - This service iterates over the provided services and executes them
- *  - If a service is not suitable it rejects (Promise.reject)
- *  Design-Problem
- *  - Using Promise.reject might work but now it is hard to distinguish if a network error or a insufficient service was the reason
- *  Outlook
- *  - We could use the Result-Pattern to have a better glimpse why an `execute`-call failed
- *  - We could explore the implementation of a chain of responsibility
- */
+import { PapierkramTimeEntryOperationClientToken } from './papierkram-time-entry-operation-client.token'
+import { PapierkramTimeEntryOperationClient } from './papierkram-time-entry-operation-client'
+import { PapierkramImportOperationError } from './papierkram-import-operation.error'
+
 @Injectable()
 export class PapierkramTimeEntryImporter
   implements PapierkramTimeEntryOperationClient
 {
+  private logger = new Logger('PapierkramTimeEntryOperationClient')
+
   constructor(
     @Inject(PapierkramTimeEntryOperationClientToken)
     private clients: PapierkramTimeEntryOperationClient[]
@@ -31,11 +21,20 @@ export class PapierkramTimeEntryImporter
       try {
         await client.execute(operation)
         return
-      } catch {
-        // try next client on error
+      } catch (error: unknown) {
+        if (
+          error instanceof PapierkramImportOperationError &&
+          error.reason == 'not suitable'
+        ) {
+          /* tolerate that client is not suitable and try the next one */
+        } else {
+          this.logger.error(error)
+        }
       }
     }
 
-    return Promise.reject(new Error('No suitable client has been executed'))
+    return Promise.reject(
+      new Error('No suitable TimeEntryOperationClient has been executed')
+    )
   }
 }

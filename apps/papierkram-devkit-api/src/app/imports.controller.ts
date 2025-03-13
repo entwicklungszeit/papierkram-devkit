@@ -31,7 +31,11 @@ export class ImportsController {
     })
 
     for (const operation of importOperations) {
-      await this.importer.execute(operation)
+      try {
+        await this.importer.execute(operation)
+      } catch (error) {
+        this.logger.error(error)
+      }
     }
 
     this.logger.log(

@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import { PapierkramTimeEntryOperationClient } from './papierkram-time-entry-operation-client'
+import { PapierkramTimeEntryOperationClient } from '../papierkram-time-entry-operation-client'
 import { PapierkramImportOperation } from '@papierkram/api'
 import { HttpService } from '@nestjs/axios'
-import { PapierkramApiConfig } from './papierkram-api-config.service'
+import { PapierkramApiConfig } from '../papierkram-api-config.service'
+import { PapierkramImportOperationError } from '../papierkram-import-operation.error'
 
 @Injectable()
 export class PapierkramTimeEntryCreateOperationClient
@@ -14,7 +15,10 @@ export class PapierkramTimeEntryCreateOperationClient
   ) {}
 
   execute(operation: PapierkramImportOperation): Promise<void> {
-    if (operation.type !== 'create') return Promise.reject()
+    if (operation.type !== 'create')
+      return Promise.reject(
+        PapierkramImportOperationError.create('not suitable')
+      )
 
     return this.httpClient.axiosRef.post(
       `${this.config.apiUrl}/tracker/time_entries`,
