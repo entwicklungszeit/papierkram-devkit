@@ -42,6 +42,11 @@ export class PapierkramTimeEntryReadClient {
         }
       )
 
+      if (response.data.entries.length > 100)
+        throw new Error(
+          'Not Supported, yet - Not all time entries could be loaded within one request. Please shrink the time range to get fewer results in order to be able to compare time entries safely.'
+        )
+
       return response.data.entries
     } catch (error) {
       this.logger.error(error)
