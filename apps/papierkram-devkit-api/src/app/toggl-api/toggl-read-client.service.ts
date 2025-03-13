@@ -27,19 +27,24 @@ export class TogglReadClient {
     this.options.projectId = this.config.get<string>('toggl_project_id') ?? ''
   }
 
-  readTimeEntries(
-    timeFrame: TimeFrame
-  ): Promise<AxiosResponse<TogglTimeEntry[]>> {
+  async readTimeEntries(timeFrame: TimeFrame): Promise<TogglTimeEntry[]> {
     const { from, to } = toDateOnly(timeFrame)
 
-    return this.httpClient.axiosRef.get(
-      `${this.options.apiUrl}/me/time_entries?start_date=${from}&end_date=${to}`,
-      {
-        auth: {
-          username: this.options.username,
-          password: this.options.password
+    try {
+      const response = await this.httpClient.axiosRef.get<TogglTimeEntry[]>(
+        `${this.options.apiUrl}/me/time_entries?start_date=${from}&end_date=${to}`,
+        {
+          auth: {
+            username: this.options.username,
+            password: this.options.password
+          }
         }
-      }
-    )
+      )
+
+      return response.data
+    } catch (error) {
+      this.logger.error(error)
+      return []
+    }
   }
 }

@@ -20,13 +20,13 @@ export class ImportsController {
 
   @Post('toggl')
   async import(@Body() timeFrame: TimeFrame) {
-    const [togglResponse, papierkramTimeEntries] = await Promise.all([
+    const [togglTimeEntries, papierkramTimeEntries] = await Promise.all([
       this.togglReadClient.readTimeEntries(timeFrame),
       this.papierkramReadClient.readTimeEntries(timeFrame)
     ])
 
     const importOperations = this.importOperationBuilder.buildWithToggl({
-      togglTimeEntries: togglResponse.data,
+      togglTimeEntries,
       papierkramTimeEntries
     })
 
