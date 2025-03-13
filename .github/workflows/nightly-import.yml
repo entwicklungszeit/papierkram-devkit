@@ -48,4 +48,4 @@ jobs:
         run: pnpm e2e
 
       - name: 🪦 Stop NestJS Application
-        run: pkill -f "node" || true # Stops all running Node.js processes
+        run: kill $(lsof -t -i:3000) || true # Stops NestJS application
