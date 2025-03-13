@@ -27,7 +27,7 @@ export class PapierkramTimeEntryImporter
   ) {}
 
   async execute(operation: PapierkramImportOperation): Promise<void> {
-    for (const client of this.client()) {
+    for (const client of this.clients) {
       try {
         await client.execute(operation)
         return
@@ -37,11 +37,5 @@ export class PapierkramTimeEntryImporter
     }
 
     return Promise.reject(new Error('No suitable client has been executed'))
-  }
-
-  private *client() {
-    for (const client of this.clients) {
-      yield client
-    }
   }
 }
