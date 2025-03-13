@@ -18,6 +18,8 @@ Furthermore, the Dashboard in Papierkram gets updated to visualize how much mone
 
 ### How it works?
 
+**Meta Data for Papierkram's time entries**
+
 To modify a time entry that has been importet from Toggl, we need the possibility to identify which time entry in Papierkram was imported.
 That's why the `Id` of the toggl time entry written to the comment of the respective time entry.
 The toggl information are serialised to a JSON-string.
@@ -30,6 +32,10 @@ This is what I have done...
 
 {"meta":{"toggl":{"timeEntry":{"id":3841295324}}}}
 ```
+
+**Scheduled workflow running the import**
+
+There is a [GitHub Action workflow](https://github.com/entwicklungszeit/papierkram-devkit/tree/main/.github/workflows) being executed every night to import the time entries to Papierkram.
 
 ### Prerequisites
 
