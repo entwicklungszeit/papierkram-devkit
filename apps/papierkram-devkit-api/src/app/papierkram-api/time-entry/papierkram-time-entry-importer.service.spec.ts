@@ -28,7 +28,7 @@ describe(PapierkramTimeEntryImporter.name, () => {
     const importer = module.get(PapierkramTimeEntryImporter)
 
     await expect(() => importer.execute(null as any)).rejects.toThrow(
-      'No suitable client has been executed'
+      'No suitable TimeEntryOperationClient has been execute'
     )
   })
 
