@@ -8,6 +8,7 @@ import {
 } from '@papierkram/api'
 import { determinePapierkramImportOperations } from './determine-papierkram-import-operations'
 import { createPapierkramTimeEntryComments } from './create-papierkram-time-entry-comments'
+import { format, parseISO } from 'date-fns'
 
 test(`Given a list of imported papierkram time entries
       When have no matching toggl time entry
@@ -162,12 +163,15 @@ test(`Given a list of toggl time entries
     .map(parseTogglMetaFromPapierkramTimeEntryComments)
     .filter(timeEntry => !!timeEntry)
 
+  const start = '2024-11-22T13:00:00.000+00Z'
+  const stop = '2024-11-22T15:00:00.000+00Z'
+
   const togglTimeEntries = [
     createTogglTimeEntry({
       id: toggleTimeEntryId,
       description: 'Worked very hard',
-      start: '2024-11-22T13:00:00.000+00Z',
-      stop: '2024-11-22T15:00:00.000+00Z'
+      start,
+      stop
     })
   ]
 
@@ -177,7 +181,9 @@ test(`Given a list of toggl time entries
   ) as [PapierkramTimeEntryUpdateOperation]
 
   expect(updateOperation.type).toBe('update')
-  expect(updateOperation.payload.started_at_time).toBe('14:00')
+  expect(updateOperation.payload.started_at_time).toBe(
+    toExpectedFormattedTime(start)
+  )
 })
 
 test(`Given a list of toggl time entries
@@ -203,12 +209,15 @@ test(`Given a list of toggl time entries
     .map(parseTogglMetaFromPapierkramTimeEntryComments)
     .filter(timeEntry => !!timeEntry)
 
+  const start = '2024-11-22T14:00:00.000+00Z'
+  const stop = '2024-11-22T16:00:00.000+00Z'
+
   const togglTimeEntries = [
     createTogglTimeEntry({
       id: toggleTimeEntryId,
       description: 'Worked very hard',
-      start: '2024-11-22T14:00:00.000+00Z',
-      stop: '2024-11-22T16:00:00.000+00Z'
+      start,
+      stop
     })
   ]
 
@@ -219,7 +228,9 @@ test(`Given a list of toggl time entries
 
   expect(updateOperation.type).toBe('update')
   expect(updateOperation.payload.started_at_time).toBeUndefined()
-  expect(updateOperation.payload.ended_at_time).toBe('17:00')
+  expect(updateOperation.payload.ended_at_time).toBe(
+    toExpectedFormattedTime(stop)
+  )
 })
 
 test(`Given a list of toggl time entries
@@ -245,12 +256,15 @@ test(`Given a list of toggl time entries
     .map(parseTogglMetaFromPapierkramTimeEntryComments)
     .filter(timeEntry => !!timeEntry)
 
+  const start = '2024-11-21T14:00:00.000+00Z'
+  const stop = '2024-11-21T15:00:00.000+00Z'
+
   const togglTimeEntries = [
     createTogglTimeEntry({
       id: toggleTimeEntryId,
       description: 'Worked very hard',
-      start: '2024-11-21T14:00:00.000+00Z',
-      stop: '2024-11-21T15:00:00.000+00Z'
+      start,
+      stop
     })
   ]
 
@@ -261,8 +275,12 @@ test(`Given a list of toggl time entries
 
   expect(updateOperation.type).toBe('update')
   expect(updateOperation.payload.entry_date).toBe('2024-11-21')
-  expect(updateOperation.payload.started_at_time).toBe('15:00')
-  expect(updateOperation.payload.ended_at_time).toBe('16:00')
+  expect(updateOperation.payload.started_at_time).toBe(
+    toExpectedFormattedTime(start)
+  )
+  expect(updateOperation.payload.ended_at_time).toBe(
+    toExpectedFormattedTime(stop)
+  )
 })
 
 test(`Given a list of toggl time entries
@@ -344,3 +362,12 @@ test(`Given a list of toggl time entries
     `\n\n---\n\n${JSON.stringify(toggleImportComment)}`
   )
 })
+
+/**
+ * Extracts time from the given date string
+ * Background: Papierkram's API expects a formatted time instead of an ISO Date.
+ * @param start
+ */
+function toExpectedFormattedTime(start: string) {
+  return format(parseISO(start), 'HH:mm')
+}
