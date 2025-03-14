@@ -21,7 +21,7 @@ export class PapierkramTimeEntryDeleteOperationClient
       )
 
     return this.httpClient.axiosRef.post(
-      `${this.config.apiUrl}/tracker/time_entries/${operation.timeEntryId}`,
+      `${this.config.apiUrl}/tracker/time_entries/${operation.timeEntryId}/archive`,
       null,
       {
         headers: {

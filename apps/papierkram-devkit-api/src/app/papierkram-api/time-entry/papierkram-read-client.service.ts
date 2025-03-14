@@ -22,15 +22,17 @@ export class PapierkramTimeEntryReadClient {
       const response = await this.httpClient.axiosRef.get<{
         entries: PapierkramTimeEntry[]
         hasMore: boolean
-      }>(
-        `${this.config.apiUrl}/tracker/time_entries?project_id=${this.config.projectId}&start_time_range_start=${from}&start_time_range_end=${to}`,
-        {
-          headers: {
-            Accept: 'application/json', // without papierkram-api yields 406 Not Acceptable
-            Authorization: `Bearer ${this.config.apiToken}`
-          }
+      }>(`${this.config.apiUrl}/tracker/time_entries`, {
+        params: {
+          projectId: this.config.projectId,
+          start_time_range_start: from,
+          start_time_range_end: to
+        },
+        headers: {
+          Accept: 'application/json', // without papierkram-api yields 406 Not Acceptable
+          Authorization: `Bearer ${this.config.apiToken}`
         }
-      )
+      })
 
       if (response.data.hasMore)
         throw new Error(
