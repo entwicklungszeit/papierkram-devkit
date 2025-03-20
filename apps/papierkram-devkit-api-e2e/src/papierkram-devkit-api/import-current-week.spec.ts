@@ -18,5 +18,5 @@ describe('Import time entries form toggl', () => {
     )
 
     expect(response.status).toBe(201)
-  })
+  }, 60_000)
 })
