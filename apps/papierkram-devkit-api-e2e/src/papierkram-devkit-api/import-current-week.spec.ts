@@ -1,14 +1,13 @@
 import axios from 'axios'
-import { endOfDay, startOfWeek } from 'date-fns'
+import { endOfWeek, startOfWeek } from 'date-fns'
 
 describe('Import time entries form toggl', () => {
   it('yields created if an import ran successful', async () => {
     const monday = 1
-    const endOfToday = endOfDay(new Date())
 
     const thisWeek = {
       from: startOfWeek(new Date(), { weekStartsOn: monday }),
-      to: endOfToday
+      to: endOfWeek(new Date(), { weekStartsOn: monday })
     }
 
     const response = await axios.post(
