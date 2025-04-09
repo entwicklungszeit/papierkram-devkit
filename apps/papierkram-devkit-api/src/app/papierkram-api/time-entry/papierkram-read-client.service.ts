@@ -6,6 +6,7 @@ import { PapierkramApiConfig } from './papierkram-api-config.service'
 import { TimeFrame } from '../../utils/time-frame'
 import { toDateOnly } from '../../utils/to-date-only'
 
+import { ResultAsync } from 'typescript-functional-extensions'
 @Injectable()
 export class PapierkramTimeEntryReadClient {
   private logger = new Logger('PapierkramTimeEntryReadClient')
