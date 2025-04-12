@@ -1,12 +1,13 @@
 import { Body, Controller, Logger, Post } from '@nestjs/common'
 import {
-  PapierkramTimeEntryReadClient,
-  PapierkramTimeEntryImporter
+  PapierkramTimeEntryImporter,
+  PapierkramTimeEntryReadClient
 } from '@papierkram/api'
 import { TogglReadClient } from '@toggl/api'
 
-import { PapierkramTimeEntryOperationBuilder } from './papierkram-import-time-entry-operation-builder.service'
+import { ResultAsync } from 'typescript-functional-extensions'
 import { TimeFrame } from '../../../utils/time-frame'
+import { PapierkramTimeEntryOperationBuilder } from './papierkram-import-time-entry-operation-builder.service'
 
 @Controller('imports')
 export class PapierkramImportTimeEntryController {
@@ -21,26 +22,30 @@ export class PapierkramImportTimeEntryController {
 
   @Post('toggl')
   async import(@Body() timeFrame: TimeFrame) {
-    const [togglTimeEntries, papierkramTimeEntries] = await Promise.all([
-      this.togglReadClient.readTimeEntries(timeFrame),
-      this.papierkramReadClient.readTimeEntries(timeFrame)
-    ])
-
-    const importOperations = this.importOperationBuilder.buildWithToggl({
-      togglTimeEntries,
-      papierkramTimeEntries
+    ResultAsync.combineInOrder({
+      papierkramTimeEntries:
+        this.papierkramReadClient.readTimeEntries(timeFrame),
+      togglTimeEntries: this.togglReadClient.readTimeEntries(timeFrame)
     })
-
-    for (const operation of importOperations) {
-      try {
-        await this.importer.execute(operation)
-      } catch (error) {
-        this.logger.error(error)
-      }
-    }
-
-    this.logger.log(
-      `${importOperations.length} time entries successfully imported`
-    )
+      .map(({ papierkramTimeEntries, togglTimeEntries }) =>
+        this.importOperationBuilder.buildWithToggl({
+          togglTimeEntries,
+          papierkramTimeEntries
+        })
+      )
+      .tap(async importOperations => {
+        for (const operation of importOperations) {
+          try {
+            await this.importer.execute(operation)
+          } catch (error) {
+            this.logger.error(error)
+          }
+        }
+      })
+      .tap(importOperations =>
+        this.logger.log(
+          `${importOperations.length} time entries successfully imported`
+        )
+      )
   }
 }
