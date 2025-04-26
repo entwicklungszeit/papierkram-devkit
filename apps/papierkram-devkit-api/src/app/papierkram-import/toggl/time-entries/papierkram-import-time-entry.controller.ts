@@ -22,7 +22,7 @@ export class PapierkramImportTimeEntryController {
 
   @Post('toggl')
   async import(@Body() timeFrame: TimeFrame) {
-    ResultAsync.combineInOrder({
+    ResultAsync.combine({
       papierkramTimeEntries:
         this.papierkramReadClient.readTimeEntries(timeFrame),
       togglTimeEntries: this.togglReadClient.readTimeEntries(timeFrame)
