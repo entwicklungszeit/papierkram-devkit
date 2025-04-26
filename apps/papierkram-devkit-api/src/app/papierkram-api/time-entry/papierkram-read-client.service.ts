@@ -26,7 +26,7 @@ export class PapierkramTimeEntryReadClient {
       )
       .map(response => response.data)
       .ensure(
-        response => response.hasMore,
+        response => !response.hasMore,
         'Not Supported, yet - Not all time entries could be loaded within one request. Please shrink the time range to get fewer results in order to be able to compare time entries safely.'
       )
       .map(response => response.entries)
