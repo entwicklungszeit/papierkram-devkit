@@ -22,11 +22,16 @@ export class PapierkramImportTimeEntryController {
 
   @Post('toggl')
   async import(@Body() timeFrame: TimeFrame) {
-    ResultAsync.combine({
+    return ResultAsync.combine({
       papierkramTimeEntries:
         this.papierkramReadClient.readTimeEntries(timeFrame),
       togglTimeEntries: this.togglReadClient.readTimeEntries(timeFrame)
     })
+      .tap(() =>
+        this.logger.log(
+          `Import time entries from ${timeFrame.from} - ${timeFrame.to}`
+        )
+      )
       .map(({ papierkramTimeEntries, togglTimeEntries }) =>
         this.importOperationBuilder.buildWithToggl({
           togglTimeEntries,
@@ -47,5 +52,6 @@ export class PapierkramImportTimeEntryController {
           `${importOperations.length} time entries successfully imported`
         )
       )
+      .toPromise()
   }
 }

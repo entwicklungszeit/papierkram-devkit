@@ -6,8 +6,8 @@ describe('Import time entries form toggl', () => {
     const monday = 1
 
     const thisWeek = {
-      from: startOfWeek(new Date(), { weekStartsOn: monday }),
-      to: endOfWeek(new Date(), { weekStartsOn: monday })
+      from: startOfWeek(new Date('2025-05-15'), { weekStartsOn: monday }),
+      to: endOfWeek(new Date('2025-05-15'), { weekStartsOn: monday })
     }
 
     const response = await axios.post(
