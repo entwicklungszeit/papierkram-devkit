@@ -1,8 +1,6 @@
 name: Nightly time entry import
 
 on:
-  schedule:
-    - cron: '0 1 * * *' # Runs every night at 01:00 UTC
   workflow_dispatch: # Allows manual triggering
 
 jobs:
