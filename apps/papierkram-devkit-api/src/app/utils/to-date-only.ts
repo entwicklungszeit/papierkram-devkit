@@ -1,9 +1,9 @@
 import { TimeFrame } from './time-frame'
-import { formatDate } from 'date-fns'
+import { formatRFC3339 } from 'date-fns'
 
 export function toDateOnly(timeFrame: TimeFrame) {
   return {
-    from: formatDate(timeFrame.from, 'yyyy-MM-dd'),
-    to: formatDate(timeFrame.to, 'yyyy-MM-dd')
+    from: formatRFC3339(timeFrame.from),
+    to: formatRFC3339(timeFrame.to)
   }
 }
